@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Cory Lown"]
   spec.email         = ["cory.lown@duke.edu"]
 
-  spec.summary       = "A Blacklight SearchBuilder method that adds support to TRLN Argon for call number and accession number searching."
-  spec.description   = "A Blacklight SearchBuilder method that adds support to TRLN Argon for call number and accession number searching."
+  spec.summary       = "Adds support to TRLN Argon for LC Call Number and accession number searching."
+  spec.description   = "Adds support to TRLN Argon for LC Call Number and accession number searching."
   spec.homepage      = "https://github.com/trln/argon_call_number_search/"
   spec.license       = "MIT"
 
