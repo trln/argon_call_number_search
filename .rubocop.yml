@@ -15,3 +15,12 @@ AllCops:
 
 Documentation:
   Enabled: false
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/**'
+    - 'argon_call_number_search.gemspec'
+
+RSpec/ExampleLength:
+  Exclude:
+    - 'spec/**/**'
