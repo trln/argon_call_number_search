@@ -70,6 +70,63 @@ ArgonCallNumberSearch.configure do |config|
 end
 ```
 
+**Important**
+
+Your records in the trlnbib Solr index must have the certain fields stored and/or indexed to support call number and accession number searching. This will require modifications to item processing in marc-to-argot.
+
+Fields that support call number searching:
+
+`lc_call_nos_normed` -- supports multi-valued LC call number searching ("bound with")
+`shelf_numbers` -- supports accession number searching ("CD 12345")
+`shelfkey` -- supports basic, single valued LC Call Number searching (field is intended to support call number *browse* but will generally work for call number *search* with the exception of "bound with" call numbers).
+
+**NOTE**
+
+Your records will likely already be populated with the single valued field `shelfkey` that contains normalized LC Call Numbers. This is a single valued field intended for call number *browse*. It will provide basic LC call number searching functionality but will not support things like "bound with" call number searching. You can safely have both the `shelfkey` and the multi-valued `lc_call_nos_normed` in your records and this gem will search both fields.
+
+Basic example of marc-to-argot item processing to add fields needed for call number searching:
+
+```
+
+def extract_items
+
+  # SNIP #
+
+  lambda do |rec, acc, ctx|
+    # SNIP #
+    shelf_numbers = []
+    lc_call_nos_normed = []
+
+    Traject::MarcExtractor.cached('940', alternate_script: false)
+                          .each_matching_line(rec) do |field, spec, extractor|
+
+      # SNIP #
+
+      # Add all normalized LC Call Nos to lc_call_nos_normed field
+      # for searching.
+      # And add all shelving control numbers
+      # to shelf_numbers for searching.
+      case item.fetch('cn_scheme', '')
+      when '0'
+        lc_call_nos_normed << Lcsort.normalize(item.fetch('call_no', '').strip)
+      when '4'
+        shelf_numbers << item.fetch('call_no', '').strip
+      end
+    end
+
+    # SNIP #
+
+    ctx.output_hash['shelf_numbers'] = shelf_numbers.uniq.compact if shelf_numbers.any?
+    ctx.output_hash['lc_call_nos_normed'] = lc_call_nos_normed.uniq.compact if lc_call_nos_normed.any?
+
+    # SNIP #
+
+  end
+end
+
+```
+
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
