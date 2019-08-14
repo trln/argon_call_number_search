@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe ArgonCallNumberSearch::Configurable do
   describe 'default values' do
     it 'has a default value for acc_num_without_space' do

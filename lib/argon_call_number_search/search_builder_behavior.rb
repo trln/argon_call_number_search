@@ -31,13 +31,16 @@ module ArgonCallNumberSearch
     end
 
     def acc_num_query
-      "_query_:\"{!edismax qf=#{TrlnArgon::Fields::SHELF_NUMBERS} pf= pf3= pf2=}"\
+      "_query_:\"{!edismax qf=#{TrlnArgon::Fields::SHELF_NUMBERS} " \
+      'pf= pf3= pf2=}' \
       "(#{blacklight_params[:q]})\""
     end
 
     def acc_num_variant_query
       return unless acc_num_variant
-      "_query_:\"{!edismax qf=#{TrlnArgon::Fields::SHELF_NUMBERS} pf= pf3= pf2=}"\
+
+      "_query_:\"{!edismax qf=#{TrlnArgon::Fields::SHELF_NUMBERS} " \
+      'pf= pf3= pf2=}' \
       "(#{acc_num_variant})\""
     end
 
@@ -79,15 +82,15 @@ module ArgonCallNumberSearch
     # Look for common accession number patterns without
     # a space between the prefix and suffix, e.g. CD123456
     def acc_num_without_space_regex
-      Regexp.new(ArgonCallNumberSearch.acc_num_without_space, Regexp::IGNORECASE)
-      # /^[\s\d[[:punct:]]]*(CD|DVD|LP|AV|VC|LD)([A-Z\d]+)/i
+      Regexp.new(ArgonCallNumberSearch.acc_num_without_space,
+                 Regexp::IGNORECASE)
     end
 
     # Look for common accession number patterns with
     # a space between the prefix and suffix, e.g. CD 123456
     def acc_num_with_space_regex
-      # /^[\s\d[[:punct:]]]*(CD|DVD|LP|AV|VC|LD)(\s+)([A-Z\d]+)/i
-      Regexp.new(ArgonCallNumberSearch.acc_num_with_space, Regexp::IGNORECASE)
+      Regexp.new(ArgonCallNumberSearch.acc_num_with_space,
+                 Regexp::IGNORECASE)
     end
   end
 end
