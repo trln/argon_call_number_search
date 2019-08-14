@@ -45,7 +45,7 @@ class CatalogController < ApplicationController
   include TrlnArgon::ControllerOverride
 
   configure_blacklight do |config|
-    # OTHER CODE
+    # SNIP
 
     config.add_search_field('call_number') do |field|
       field.label = I18n.t('trln_argon.search_fields.call_number')
@@ -53,7 +53,7 @@ class CatalogController < ApplicationController
       field.include_in_advanced_search = false
     end
 
-    # OTHER CODE
+    # SNIP
   end
 end
 ```
@@ -70,17 +70,15 @@ ArgonCallNumberSearch.configure do |config|
 end
 ```
 
-**Important**
+**IMPORTANT: Solr fields required to support call number search.**
 
-Your records in the trlnbib Solr index must have the certain fields stored and/or indexed to support call number and accession number searching. This will require modifications to item processing in marc-to-argot.
+Your records in the trlnbib Solr index must have certain fields stored and/or indexed to support call number and accession number searching. This will require modifications to item processing in marc-to-argot.
 
 Fields that support call number searching:
 
-`lc_call_nos_normed` -- supports multi-valued LC call number searching ("bound with")
-`shelf_numbers` -- supports accession number searching ("CD 12345")
-`shelfkey` -- supports basic, single valued LC Call Number searching (field is intended to support call number *browse* but will generally work for call number *search* with the exception of "bound with" call numbers).
-
-**NOTE**
+* `lc_call_nos_normed` -- supports multi-valued LC call number searching ("bound with")
+* `shelf_numbers` -- supports accession number searching ("CD 12345")
+* `shelfkey` -- supports basic, single valued LC Call Number searching (field is intended to support call number *browse* but will generally work for call number *search* with the exception of "bound with" call numbers).
 
 Your records will likely already be populated with the single valued field `shelfkey` that contains normalized LC Call Numbers. This is a single valued field intended for call number *browse*. It will provide basic LC call number searching functionality but will not support things like "bound with" call number searching. You can safely have both the `shelfkey` and the multi-valued `lc_call_nos_normed` in your records and this gem will search both fields.
 
