@@ -7,7 +7,7 @@ This adds a Blacklight SearchBuilder method to TrlnArgon to support searching of
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'argon_call_number_search'
+gem 'argon_call_number_search', git: 'https://github.com/trln/argon_call_number_search'
 ```
 
 And then execute:
