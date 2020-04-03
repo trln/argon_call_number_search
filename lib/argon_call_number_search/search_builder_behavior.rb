@@ -6,16 +6,33 @@ module ArgonCallNumberSearch
       return unless call_number_query_present?
 
       solr_parameters[:defType] = 'lucene'
-      solr_parameters[:q] = call_number_queries
+      if blacklight_params[:search_field] == 'advanced' && solr_parameters[:q]
+        # Replace default call number query from Blacklight advanced search handling
+        solr_parameters[:q] = solr_parameters[:q].gsub("_query_:\"{!edismax}#{call_number_query_str}\"",
+                                                       "(#{call_number_queries})")
+      else
+        solr_parameters[:q] = call_number_queries
+      end
     end
 
     private
 
     def call_number_query_present?
-      blacklight_params.key?('search_field') &&
-        blacklight_params['search_field'] == 'call_number' &&
-        blacklight_params[:q].present? &&
-        blacklight_params[:q].respond_to?(:to_str)
+      blacklight_params.key?(:search_field) &&
+          (blacklight_params[:search_field] == 'call_number' &&
+              blacklight_params[:q].present? &&
+              blacklight_params[:q].respond_to?(:to_str)) ||
+          (blacklight_params[:search_field] == 'advanced' &&
+              blacklight_params[:call_number].present? &&
+              blacklight_params[:call_number].respond_to?(:to_str))
+    end
+
+    def call_number_query_str
+      if blacklight_params[:search_field] == 'call_number'
+        blacklight_params[:q].to_s
+      elsif blacklight_params[:search_field] == 'advanced'
+        blacklight_params[:call_number].to_s
+      end
     end
 
     def call_number_queries
@@ -26,14 +43,13 @@ module ArgonCallNumberSearch
     end
 
     def normalized_lc_callno
-      @normalized_lc_callno ||= Lcsort.normalize(blacklight_params[:q].to_s) ||
-                                blacklight_params[:q].to_s
+      @normalized_lc_callno ||= Lcsort.normalize(call_number_query_str) || call_number_query_str
     end
 
     def acc_num_query
       "_query_:\"{!edismax qf=#{TrlnArgon::Fields::SHELF_NUMBERS} " \
       'pf= pf3= pf2=}' \
-      "(#{blacklight_params[:q]})\""
+      "(#{call_number_query_str})\""
     end
 
     def acc_num_variant_query
@@ -49,9 +65,9 @@ module ArgonCallNumberSearch
     # Convert CD 123456 to CD123456
     def acc_num_variant
       if query_includes_acc_num_without_space?
-        blacklight_params[:q].to_s.gsub(acc_num_without_space_regex, '\1 \2')
+        call_number_query_str.gsub(acc_num_without_space_regex, '\1 \2')
       elsif query_includes_acc_num_with_space?
-        blacklight_params[:q].to_s.gsub(acc_num_with_space_regex, '\1\3')
+        call_number_query_str.gsub(acc_num_with_space_regex, '\1\3')
       end
     end
 
@@ -72,11 +88,11 @@ module ArgonCallNumberSearch
     end
 
     def query_includes_acc_num_without_space?
-      blacklight_params[:q].to_s.match?(acc_num_without_space_regex)
+      call_number_query_str.match?(acc_num_without_space_regex)
     end
 
     def query_includes_acc_num_with_space?
-      blacklight_params[:q].to_s.match?(acc_num_with_space_regex)
+      call_number_query_str.match?(acc_num_with_space_regex)
     end
 
     # Look for common accession number patterns without

@@ -22,7 +22,8 @@ Or install it yourself as:
 
 Once installed in your Argon app some setup is required to enable call number searching.
 
-In `app/models/search_builder.rb` add `include ArgonCallNumberSearch::SearchBuilderBehavior` and add the `add_call_number_query_to_solr` method to the default processor chain.
+In `app/models/search_builder.rb` add `include ArgonCallNumberSearch::SearchBuilderBehavior` and add the `add_call_number_query_to_solr` method to the default processor chain, 
+after `add_advanced_search_to_solr` if using Blacklight's `AdvancedSearchBuilder`.
 
 For example:
 
@@ -31,7 +32,8 @@ class SearchBuilder < Blacklight::SearchBuilder
   include Blacklight::Solr::SearchBuilderBehavior
   include ArgonCallNumberSearch::SearchBuilderBehavior
 
-  self.default_processor_chain += %i[add_call_number_query_to_solr]
+  self.default_processor_chain += %i[add_advanced_search_to_solr
+                                     add_call_number_query_to_solr]
 end
 ```
 
@@ -50,7 +52,6 @@ class CatalogController < ApplicationController
     config.add_search_field('call_number') do |field|
       field.label = I18n.t('trln_argon.search_fields.call_number')
       field.advanced_parse = false
-      field.include_in_advanced_search = false
     end
 
     # SNIP
