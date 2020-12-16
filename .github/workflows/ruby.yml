@@ -25,6 +25,12 @@ jobs:
         ruby-version: 2.5.3
         bundler-cache: true
 
+    - name: Install bundler
+      run: gem install bundler -v 2.0.2
+
+    - name: Install trln-argon
+      run: gem install trln_argon --source https://github.com/trln/trln_argon.git
+
     - name: Install dependencies
       run: bundle install
 
