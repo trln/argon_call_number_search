@@ -31,5 +31,8 @@ jobs:
     - name: Install trln-argon
       run: gem install trln_argon --source https://github.com/trln/trln_argon.git
 
+    - name: Install dependencies
+      run: bundle update
+
     - name: Run tests
       run: rspec
