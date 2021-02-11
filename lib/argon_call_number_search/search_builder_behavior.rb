@@ -6,31 +6,34 @@ module ArgonCallNumberSearch
       return unless call_number_query_present?
 
       solr_parameters[:defType] = 'lucene'
-      if blacklight_params[:search_field] == 'advanced' && solr_parameters[:q]
-        # Replace default call number query from Blacklight advanced search handling
-        solr_parameters[:q] = solr_parameters[:q].gsub("_query_:\"{!edismax}#{call_number_query_str}\"",
+      solr_parameters[:q] = if blacklight_params[:search_field] == 'advanced' && solr_parameters[:q]
+                              # Replace default call number query from Blacklight advanced search handling
+                              solr_parameters[:q].gsub("_query_:\"{!edismax}#{call_number_query_str}\"",
                                                        "(#{call_number_queries})")
-      else
-        solr_parameters[:q] = call_number_queries
-      end
+                            else
+                              call_number_queries
+                            end
     end
 
     private
 
+    # rubocop:disable Metrics/AbcSize
     def call_number_query_present?
       blacklight_params.key?(:search_field) &&
-          (blacklight_params[:search_field] == 'call_number' &&
-              blacklight_params[:q].present? &&
-              blacklight_params[:q].respond_to?(:to_str)) ||
-          (blacklight_params[:search_field] == 'advanced' &&
-              blacklight_params[:call_number].present? &&
-              blacklight_params[:call_number].respond_to?(:to_str))
+        (blacklight_params[:search_field] == 'call_number' &&
+            blacklight_params[:q].present? &&
+            blacklight_params[:q].respond_to?(:to_str)) ||
+        (blacklight_params[:search_field] == 'advanced' &&
+            blacklight_params[:call_number].present? &&
+            blacklight_params[:call_number].respond_to?(:to_str))
     end
+    # rubocop:enable Metrics/AbcSize
 
     def call_number_query_str
-      if blacklight_params[:search_field] == 'call_number'
+      case blacklight_params[:search_field]
+      when 'call_number'
         blacklight_params[:q].to_s
-      elsif blacklight_params[:search_field] == 'advanced'
+      when 'advanced'
         blacklight_params[:call_number].to_s
       end
     end
