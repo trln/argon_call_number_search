@@ -46,14 +46,16 @@ RSpec.describe ArgonCallNumberSearch::SearchBuilderBehavior do
 
     context 'when advanced search' do
       let(:blacklight_parameters) do
-        { search_field: 'advanced',
-          title: 'meditations',
-          call_number: 'PS3623.I556497 P433',
+        { clause: {
+          '0': { field: 'title', query: 'meditations' },
+          '1': { field: 'call_number', query: 'PS3623.I556497 P433' }
+        },
           op: 'AND' }
       end
       let(:solr_parameters) do # solr_parameters from advanced search
         { q: '_query_:"{!edismax qf=$title_qf pf=$title_pf pf3=$title_pf3 pf2=$title_pf2}' \
-                "#{blacklight_parameters[:title]}\" AND _query_:\"{!edismax}#{blacklight_parameters[:call_number]}\"" }
+                "#{blacklight_parameters[:clause][:'0'][:query]}\"" \
+                " AND _query_:\"{!edismax}#{blacklight_parameters[:clause][:'1'][:query]}\"" }
       end
 
       it 'generates a solr query' do
@@ -88,14 +90,16 @@ RSpec.describe ArgonCallNumberSearch::SearchBuilderBehavior do
 
     context 'when advanced search' do
       let(:blacklight_parameters) do
-        { search_field: 'advanced',
-          title: 'ballad',
-          call_number: 'cd 12345',
+        { clause: {
+          '0': { field: 'title', query: 'ballad' },
+          '1': { field: 'call_number', query: 'cd 12345' }
+        },
           op: 'OR' }
       end
       let(:solr_parameters) do # solr_parameters from advanced search
         { q: '_query_:"{!edismax qf=$title_qf pf=$title_pf pf3=$title_pf3 pf2=$title_pf2}' \
-                "#{blacklight_parameters[:title]}\" OR _query_:\"{!edismax}#{blacklight_parameters[:call_number]}\"" }
+                "#{blacklight_parameters[:clause][:'0'][:query]}\"" \
+                " OR _query_:\"{!edismax}#{blacklight_parameters[:clause][:'1'][:query]}\"" }
       end
 
       it 'generates a solr query' do
