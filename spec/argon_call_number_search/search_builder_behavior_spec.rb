@@ -47,9 +47,9 @@ RSpec.describe ArgonCallNumberSearch::SearchBuilderBehavior do
     context 'when advanced search' do
       let(:blacklight_parameters) do
         { clause: {
-          '0': { field: 'title', query: 'meditations' },
-          '1': { field: 'call_number', query: 'PS3623.I556497 P433' }
-        },
+            '0': { field: 'title', query: 'meditations' },
+            '1': { field: 'call_number', query: 'PS3623.I556497 P433' }
+          },
           op: 'AND' }
       end
       let(:solr_parameters) do # solr_parameters from advanced search
@@ -91,9 +91,9 @@ RSpec.describe ArgonCallNumberSearch::SearchBuilderBehavior do
     context 'when advanced search' do
       let(:blacklight_parameters) do
         { clause: {
-          '0': { field: 'title', query: 'ballad' },
-          '1': { field: 'call_number', query: 'cd 12345' }
-        },
+            '0': { field: 'title', query: 'ballad' },
+            '1': { field: 'call_number', query: 'cd 12345' }
+          },
           op: 'OR' }
       end
       let(:solr_parameters) do # solr_parameters from advanced search
