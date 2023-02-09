@@ -6,7 +6,7 @@ module ArgonCallNumberSearch
       return unless call_number_query_present?
 
       solr_parameters[:defType] = 'lucene'
-      solr_parameters[:q] = if blacklight_params[:search_field] == 'advanced' && solr_parameters[:q]
+      solr_parameters[:q] = if advanced_search? && solr_parameters[:q]
                               # Replace default call number query from Blacklight advanced search handling
                               solr_parameters[:q].gsub("_query_:\"{!edismax}#{call_number_query_str}\"",
                                                        "(#{call_number_queries})")
@@ -17,24 +17,45 @@ module ArgonCallNumberSearch
 
     private
 
-    # rubocop:disable Metrics/AbcSize
     def call_number_query_present?
-      blacklight_params.key?(:search_field) &&
-        (blacklight_params[:search_field] == 'call_number' &&
-            blacklight_params[:q].present? &&
-            blacklight_params[:q].respond_to?(:to_str)) ||
-        (blacklight_params[:search_field] == 'advanced' &&
-            blacklight_params[:call_number].present? &&
-            blacklight_params[:call_number].respond_to?(:to_str))
+      default_call_num_search? || advanced_call_num_search?
     end
-    # rubocop:enable Metrics/AbcSize
+
+    def default_call_num_search?
+      blacklight_params.key?(:search_field) &&
+        blacklight_params[:search_field] == 'call_number' &&
+        blacklight_params[:q].present? &&
+        blacklight_params[:q].respond_to?(:to_str)
+    end
+
+    def advanced_call_num_search?
+      return false unless advanced_search?
+
+      advanced_search_keys.each do |key|
+        if blacklight_params[:clause][key][:field] == 'call_number' &&
+           !blacklight_params[:clause][key][:query].blank?
+          return true
+        end
+      end
+
+      false
+    end
+
+    def advanced_search?
+      blacklight_params.key?(:clause)
+    end
+
+    def advanced_search_keys
+      blacklight_params[:clause].keys
+    end
 
     def call_number_query_str
-      case blacklight_params[:search_field]
-      when 'call_number'
-        blacklight_params[:q].to_s
-      when 'advanced'
-        blacklight_params[:call_number].to_s
+      return blacklight_params[:q].to_s if blacklight_params[:search_field] == 'call_number'
+      return unless advanced_search?
+
+      advanced_search_keys.each do |key|
+        current_param = blacklight_params[:clause][key]
+        return current_param[:query].to_s if current_param[:field] == 'call_number'
       end
     end
 
