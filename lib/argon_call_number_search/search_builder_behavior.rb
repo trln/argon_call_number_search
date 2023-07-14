@@ -49,9 +49,10 @@ module ArgonCallNumberSearch
       blacklight_params[:clause].keys
     end
 
+    # rubocop:disable Metrics/AbcSize
     def call_number_query_str
-      blacklight_params[:q] = blacklight_params[:q].truncate_words(150, separator: /\W+/, omission: '') unless
-           blacklight_params[:q] <= 150
+      blacklight_params[:q] = blacklight_params[:q].truncate_words(50, separator: /\W+/, omission: '') unless
+        query_length <= 50
       return blacklight_params[:q].to_s if blacklight_params[:search_field] == 'call_number'
       return unless advanced_search?
 
@@ -59,6 +60,11 @@ module ArgonCallNumberSearch
         current_param = blacklight_params[:clause][key]
         return current_param[:query].to_s if current_param[:field] == 'call_number'
       end
+    end
+    # rubocop:enable Metrics/AbcSize
+
+    def query_length
+      blacklight_params[:q].split(/\b/).select { |x| x.match?(/\w/) }.length
     end
 
     def call_number_queries
