@@ -50,6 +50,8 @@ module ArgonCallNumberSearch
     end
 
     def call_number_query_str
+      blacklight_params[:q] = blacklight_params[:q].truncate_words(150, separator: /\W+/, omission: '') unless
+           blacklight_params[:q] <= 150
       return blacklight_params[:q].to_s if blacklight_params[:search_field] == 'call_number'
       return unless advanced_search?
 
