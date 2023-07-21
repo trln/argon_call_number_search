@@ -11,6 +11,7 @@ module ArgonCallNumberSearch
                               solr_parameters[:q].gsub("_query_:\"{!edismax}#{call_number_query_str}\"",
                                                        "(#{call_number_queries})")
                             else
+                              truncate_query
                               call_number_queries
                             end
     end
@@ -19,6 +20,11 @@ module ArgonCallNumberSearch
 
     def call_number_query_present?
       default_call_num_search? || advanced_call_num_search?
+    end
+
+    def truncate_query
+      blacklight_params[:q] = blacklight_params[:q].truncate_words(50, separator: /\W+/, omission: '') unless
+        blacklight_params[:q].split(/\b/).select { |x| x.match?(/\w/) }.length <= 50
     end
 
     def default_call_num_search?
