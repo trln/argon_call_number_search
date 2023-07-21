@@ -11,6 +11,7 @@ module ArgonCallNumberSearch
                               solr_parameters[:q].gsub("_query_:\"{!edismax}#{call_number_query_str}\"",
                                                        "(#{call_number_queries})")
                             else
+                              truncate_query
                               call_number_queries
                             end
     end
@@ -19,6 +20,11 @@ module ArgonCallNumberSearch
 
     def call_number_query_present?
       default_call_num_search? || advanced_call_num_search?
+    end
+
+    def truncate_query
+      blacklight_params[:q] = blacklight_params[:q].truncate_words(50, separator: /\W+/, omission: '') unless
+        blacklight_params[:q].split(/\b/).select { |x| x.match?(/\w/) }.length <= 50
     end
 
     def default_call_num_search?
@@ -49,10 +55,7 @@ module ArgonCallNumberSearch
       blacklight_params[:clause].keys
     end
 
-    # rubocop:disable Metrics/AbcSize
     def call_number_query_str
-      blacklight_params[:q] = blacklight_params[:q].truncate_words(50, separator: /\W+/, omission: '') unless
-        query_length <= 50
       return blacklight_params[:q].to_s if blacklight_params[:search_field] == 'call_number'
       return unless advanced_search?
 
@@ -60,11 +63,6 @@ module ArgonCallNumberSearch
         current_param = blacklight_params[:clause][key]
         return current_param[:query].to_s if current_param[:field] == 'call_number'
       end
-    end
-    # rubocop:enable Metrics/AbcSize
-
-    def query_length
-      blacklight_params[:q].split(/\b/).select { |x| x.match?(/\w/) }.length
     end
 
     def call_number_queries
