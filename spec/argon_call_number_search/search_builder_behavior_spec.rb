@@ -12,6 +12,20 @@ module TrlnArgon
   end
 end
 
+module TrlnArgon
+  module Engine
+    class Configuration
+      def enable_query_truncation
+        true
+      end
+    end
+
+    def self.configuration
+      Configuration.new
+    end
+  end
+end
+
 class SearchBuilderTestClass
   include ArgonCallNumberSearch::SearchBuilderBehavior
   include TrlnArgon::Fields
