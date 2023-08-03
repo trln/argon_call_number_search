@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'argon_call_number_search/version'
+require 'lcsort'
 
 module ArgonCallNumberSearch
   autoload :Configurable, 'argon_call_number_search/configurable'
