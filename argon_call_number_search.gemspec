@@ -7,7 +7,7 @@ require 'argon_call_number_search/version'
 Gem::Specification.new do |spec|
   spec.name          = 'argon_call_number_search'
   spec.version       = ArgonCallNumberSearch::VERSION
-  spec.required_ruby_version = '~> 2.4'
+  spec.required_ruby_version = '>= 2.7.5'
   spec.authors       = ['Cory Lown']
   spec.email         = ['cory.lown@duke.edu']
 
